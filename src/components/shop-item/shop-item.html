@@ -6,11 +6,11 @@
       <h5 class="secondary">${shopItem.priceString}</h5>
     </div>
     <div class="panel-body">
-      <img src="${shopItem.imgPath}" />
-      <p>In stock: <strong>${shopItem.stockCount}</strong></p>
+      <img class="item-image" src="${shopItem.imgPath}" />
+      <p>In stock: <strong class="${isOutOfStock ? 'stock-count-out' : 'stock-count-has'}">${shopItem.stockCount}</strong></p>
     </div>
     <div class="panel-footer">
-      <button class="btn btn-primary btn-block add-to-cart" type="button">Add to cart</button>
+      <button class="btn ${isOutOfStock ? 'disabled' : ''} btn-primary btn-block add-to-cart" type="button">${isOutOfStock ? 'Out of stock' : 'Add to cart'}</button>
     </div>
   </div>
 </template>

@@ -1,2 +1,7 @@
-export class AddedToCartSuccessEvent {}
-export class AddedToCartFailureEvent {}
+export class AddToCartSuccessEvent {
+  constructor(item) {
+    this.item = item;
+  }
+}
+
+export class AddToCartFailureEvent {}
