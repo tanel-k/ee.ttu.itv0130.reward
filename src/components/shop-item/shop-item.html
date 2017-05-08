@@ -1,0 +1,16 @@
+<template>
+  <require from="./shop-item.css"></require>
+  <div class="item panel panel-primary">
+    <div class="panel-heading">
+      <h4>${name}</h4>
+      <h5>${price}</h5>
+    </div>
+    <div class="panel-body">
+      <img src="${img}" />
+      <p>In stock: <strong>${inStock}</strong></p>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-primary btn-block add-to-cart" type="button">Add to cart</button>
+    </div>
+  </div>
+</template>
