@@ -1,7 +1,9 @@
 export default class ShopItem {
-  constructor() {}
+  constructor() {
 
-  activate(itemModel) {
-    Object.assign(this, itemModel);
+  }
+
+  activate(shopItem) {
+    this.shopItem = shopItem;
   }
 }

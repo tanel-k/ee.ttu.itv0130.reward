@@ -1,41 +1,25 @@
+import { inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
+
 import 'jquery';
 import 'jquery-ui-dist';
 
+import { default as ShopItem } from '../../entities/shop-item';
+import { AddedToCartSuccessEvent } from '../../events/events';
+
+@inject(EventAggregator)
 export class ShopPage {
   shopItems = [
-    {
-      img: '../../media/img/saw-blade.jpg',
-      name: 'Saw blade',
-      price: '$2.00',
-      inStock: 10
-    },
-    {
-      img: '../../media/img/hammer.jpg',
-      name: 'Hammer',
-      price: '$15.00',
-      inStock: 10
-    },
-    {
-      img: '../../media/img/pliers.jpg',
-      name: 'Pliers',
-      price: '$23.40',
-      inStock: 10
-    },
-    {
-      img: '../../media/img/drill.jpg',
-      name: 'Drill',
-      price: '$100.00',
-      inStock: 10
-    },
-    {
-      img: '../../media/img/screw-drivers.jpg',
-      name: 'Screwdriver kit',
-      price: '$35.00',
-      inStock: 10
-    }
+    new ShopItem('Saw blade', '../../media/img/saw-blade.jpg', 2.00, '$', 120),
+    new ShopItem('Hammer', '../../media/img/hammer.jpg', 15.00, '$', 25),
+    new ShopItem('Pliers', '../../media/img/pliers.jpg', 23.40, '$', 24),
+    new ShopItem('Drill', '../../media/img/drill.jpg', 100.00, '$', 5),
+    new ShopItem('Screwdriver kit', '../../media/img/screw-drivers.jpg', 35.00, '$', 10),
+    new ShopItem('Wrench', '../../media/img/wrench.jpg', 17.00, '$', 24)
   ];
 
-  constructor() {
+  constructor(ea) {
+    this.ea = ea;
     this.audioBank = {
       cartClank: new Audio('../../media/audio/shopping_cart_clank.mp3'),
       cartSemiClank: new Audio('../../media/audio/shopping_cart_cut_short.mp3'),
@@ -44,6 +28,7 @@ export class ShopPage {
   }
 
   attached() {
+    // animate adding stuff to the cart
     $('button.add-to-cart').on('click', (event) => {
       const cart = $('.shopping-cart-icon');
       const itemIcon = $(event.target).parents('.item').find('img').eq(0);
@@ -67,29 +52,15 @@ export class ShopPage {
             'left': cart.offset().left + 10,
             'width': 75,
             'height': 75
-          }, 1000, 'easeInOutExpo');
-
+          }, 750, 'easeInOutExpo');
         setTimeout(() => {
-          this.playCartClank();
-          cart.effect('shake', { times: 2 }, 200);
-        }, 1500);
+          this.ea.publish(new AddedToCartSuccessEvent());
+        }, 1250);
 
         itemIconClone.animate({ 'width': 0, 'height': 0 }, () => {
           $(itemIconClone).detach();
         });
       }
     });
-  }
-
-  playCartClank() {
-    this.audioBank.cartClank.play();
-  }
-
-  playCartSemiClank() {
-    this.audioBank.cartSemiClank.play();
-  }
-
-  playCartOpen() {
-    this.audioBank.cartOpen.play();
   }
 }

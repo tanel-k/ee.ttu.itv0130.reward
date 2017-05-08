@@ -2,12 +2,12 @@
   <require from="./shop-item.css"></require>
   <div class="item panel panel-primary">
     <div class="panel-heading">
-      <h4>${name}</h4>
-      <h5>${price}</h5>
+      <h4 class="primary">${shopItem.name}</h4>
+      <h5 class="secondary">${shopItem.priceString}</h5>
     </div>
     <div class="panel-body">
-      <img src="${img}" />
-      <p>In stock: <strong>${inStock}</strong></p>
+      <img src="${shopItem.imgPath}" />
+      <p>In stock: <strong>${shopItem.stockCount}</strong></p>
     </div>
     <div class="panel-footer">
       <button class="btn btn-primary btn-block add-to-cart" type="button">Add to cart</button>

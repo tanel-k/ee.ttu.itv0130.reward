@@ -2,8 +2,8 @@
   <require from='./shop-page.css'></require>
   <div class="wrapper">
     <span><i class="shopping-cart"></i></span>
-    <compose view-model="../../components/cart/cart" model.bind="{}"></compose>
-    <h3>A Rewarding Toolshed</h3>
+    <compose view-model.ref="cartViewModel" view-model="../../components/cart/cart" model.bind="{}"></compose>
+    <h3>A Rewarding Webstore</h3>
     <div class="items">
       <compose repeat.for="shopItem of shopItems" view-model="../../components/shop-item/shop-item" model.bind="shopItem"></compose>
     </div>

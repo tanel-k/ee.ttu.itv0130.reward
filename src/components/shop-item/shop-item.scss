@@ -19,7 +19,13 @@
 .item.panel-primary {
   .panel-heading {
     h1,h2,h3,h4,h5,h6 {
-      color: white !important;
+      &.primary {
+        color: white !important;
+      }
+
+      &.secondary {
+        color: #F5F3F0 !important;
+      }
     }
   }
 }
