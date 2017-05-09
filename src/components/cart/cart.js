@@ -27,11 +27,11 @@ export default class Cart {
     this.countMap = {};
     this.priceMap = {};
     this.audioBank = {
-      cartClank: new Audio('../../media/audio/shopping_cart_clank.mp3'),
-      cartSemiClank: new Audio('../../media/audio/shopping_cart_cut_short.mp3'),
-      cartOpen: new Audio('../../media/audio/shopping_cart_open.mp3'),
-      cartClose: new Audio('../../media/audio/shopping_cart_close.mp3'),
-      ding: new Audio('../../media/audio/cash_register_ding.mp3')
+      cartClank: new Audio('media/audio/shopping_cart_clank.mp3'),
+      cartSemiClank: new Audio('media/audio/shopping_cart_cut_short.mp3'),
+      cartOpen: new Audio('media/audio/shopping_cart_open.mp3'),
+      cartClose: new Audio('media/audio/shopping_cart_close.mp3'),
+      ding: new Audio('media/audio/cash_register_ding.mp3')
     };
   }
 

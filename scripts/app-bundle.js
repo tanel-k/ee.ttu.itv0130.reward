@@ -223,11 +223,11 @@ define('components/cart/cart',['exports', 'aurelia-framework', 'aurelia-event-ag
       this.countMap = {};
       this.priceMap = {};
       this.audioBank = {
-        cartClank: new Audio('../../media/audio/shopping_cart_clank.mp3'),
-        cartSemiClank: new Audio('../../media/audio/shopping_cart_cut_short.mp3'),
-        cartOpen: new Audio('../../media/audio/shopping_cart_open.mp3'),
-        cartClose: new Audio('../../media/audio/shopping_cart_close.mp3'),
-        ding: new Audio('../../media/audio/cash_register_ding.mp3')
+        cartClank: new Audio('media/audio/shopping_cart_clank.mp3'),
+        cartSemiClank: new Audio('media/audio/shopping_cart_cut_short.mp3'),
+        cartOpen: new Audio('media/audio/shopping_cart_open.mp3'),
+        cartClose: new Audio('media/audio/shopping_cart_close.mp3'),
+        ding: new Audio('media/audio/cash_register_ding.mp3')
       };
     };
 
@@ -490,7 +490,7 @@ define('containers/shop-page/shop-page',['exports', '../../entities/shop-item'],
   var ShopPage = exports.ShopPage = function ShopPage() {
     _classCallCheck(this, ShopPage);
 
-    this.shopItems = [new _shopItem2.default('sb', 'Saw blade', '../../media/img/saw-blade.jpg', 2.00, '$', 12), new _shopItem2.default('hm', 'Hammer', '../../media/img/hammer.jpg', 15.00, '$', 25), new _shopItem2.default('pl', 'Pliers', '../../media/img/pliers.jpg', 23.40, '$', 24), new _shopItem2.default('dr', 'Drill', '../../media/img/drill.jpg', 100.00, '$', 5), new _shopItem2.default('sk', 'Screwdriver kit', '../../media/img/screw-drivers.jpg', 35.00, '$', 10), new _shopItem2.default('wr', 'Wrench', '../../media/img/wrench.jpg', 17.00, '$', 24), new _shopItem2.default('ag', 'Angle grinder', '../../media/img/angle-grinder.jpg', 250.00, '$', 4), new _shopItem2.default('lc', 'Locking clamp', '../../media/img/locking-clamp.jpg', 3.00, '$', 45), new _shopItem2.default('mt', 'Masking tape', '../../media/img/masking-tape.jpg', 1.00, '$', 35), new _shopItem2.default('sr', 'Remover set', '../../media/img/scraper-and-remover-set.jpg', 25.00, '$', 3), new _shopItem2.default('st', 'Rubber mallet', '../../media/img/rubber-mallet.jpg', 15.00, '$', 12), new _shopItem2.default('st', 'Scraper set', '../../media/img/scraper-set.jpg', 20.00, '$', 23)];
+    this.shopItems = [new _shopItem2.default('sb', 'Saw blade', 'media/img/saw-blade.jpg', 2.00, '$', 12), new _shopItem2.default('hm', 'Hammer', 'media/img/hammer.jpg', 15.00, '$', 25), new _shopItem2.default('pl', 'Pliers', 'media/img/pliers.jpg', 23.40, '$', 24), new _shopItem2.default('dr', 'Drill', 'media/img/drill.jpg', 100.00, '$', 5), new _shopItem2.default('sk', 'Screwdriver kit', 'media/img/screw-drivers.jpg', 35.00, '$', 10), new _shopItem2.default('wr', 'Wrench', 'media/img/wrench.jpg', 17.00, '$', 24), new _shopItem2.default('ag', 'Angle grinder', 'media/img/angle-grinder.jpg', 250.00, '$', 4), new _shopItem2.default('lc', 'Locking clamp', 'media/img/locking-clamp.jpg', 3.00, '$', 45), new _shopItem2.default('mt', 'Masking tape', 'media/img/masking-tape.jpg', 1.00, '$', 35), new _shopItem2.default('sr', 'Remover set', 'media/img/scraper-and-remover-set.jpg', 25.00, '$', 3), new _shopItem2.default('st', 'Rubber mallet', 'media/img/rubber-mallet.jpg', 15.00, '$', 12), new _shopItem2.default('st', 'Scraper set', 'media/img/scraper-set.jpg', 20.00, '$', 23)];
   };
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template><require from=\"jquery-ui-dist/jquery-ui.css\"></require><router-view></router-view></template>"; });
