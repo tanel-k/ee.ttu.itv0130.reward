@@ -110,10 +110,11 @@ define('entities/shop-item',["exports"], function (exports) {
   }();
 
   var ShopItem = function () {
-    function ShopItem(name, imgPath, price, priceCurrencySymbol, stockCount) {
+    function ShopItem(code, name, imgPath, price, priceCurrencySymbol, stockCount) {
       _classCallCheck(this, ShopItem);
 
       Object.assign(this, {
+        code: code,
         name: name,
         imgPath: imgPath,
         price: price,
@@ -216,22 +217,34 @@ define('components/cart/cart',['exports', 'aurelia-framework', 'aurelia-event-ag
     };
 
     Cart.prototype.initializeData = function initializeData() {
-      this.cartItems = [];
+      this.isBuying = false;
+      this.isProcessing = false;
+      this.cartItemSet = new Set();
+      this.countMap = {};
+      this.priceMap = {};
       this.audioBank = {
         cartClank: new Audio('../../media/audio/shopping_cart_clank.mp3'),
-        cartSemiClank: new Audio('../../media/audio/shopping_cart_cut_short.mp3')
+        cartSemiClank: new Audio('../../media/audio/shopping_cart_cut_short.mp3'),
+        cartOpen: new Audio('../../media/audio/shopping_cart_open.mp3'),
+        cartClose: new Audio('../../media/audio/shopping_cart_close.mp3'),
+        ding: new Audio('../../media/audio/cash_register_ding.mp3')
       };
     };
 
     Cart.prototype.initializeDOMHooks = function initializeDOMHooks() {
+      this.$element = $(this.element);
       this.$cartIcon = $(this.element.querySelector('i.shopping-cart-icon'));
+      this.shoppingCartToggle = this.element.querySelector('.shopping-cart-toggle');
+      this.$shoppingCartToggle = $(this.shoppingCartToggle);
+      this.$priceLabel = $(this.element.querySelector('#price-label'));
     };
 
     Cart.prototype.wireEvents = function wireEvents() {
       var _this = this;
 
       this.ea.subscribe(_events.AddToCartSuccessEvent, function (event) {
-        _this.cartItems.push(event.item);
+        _this.registerItem(event.item);
+        _this.animatePriceLabel();
         _this.audioBank.cartClank.cloneNode().play();
         _this.$cartIcon.effect('shake', { times: 2 }, 200);
       });
@@ -241,18 +254,86 @@ define('components/cart/cart',['exports', 'aurelia-framework', 'aurelia-event-ag
       });
     };
 
+    Cart.prototype.animatePriceLabel = function animatePriceLabel() {
+      var _this2 = this;
+
+      this.$priceLabel.removeClass('animated flipInX');
+      setTimeout(function () {
+        return _this2.$priceLabel.addClass('animated flipInX');
+      }, 0);
+    };
+
+    Cart.prototype.registerItem = function registerItem(item) {
+      this.cartItemSet.add(item);
+      if (typeof this.countMap[item.code] !== 'number') {
+        this.countMap[item.code] = 0;
+      }
+      this.countMap[item.code]++;
+
+      if (typeof this.priceMap[item.code] !== 'number') {
+        this.priceMap[item.code] = 0.0;
+      }
+      this.priceMap[item.code] += item.price;
+    };
+
+    Cart.prototype.resetCart = function resetCart() {
+      this.cartItemSet.clear();
+      this.countMap = {};
+      this.priceMap = {};
+    };
+
+    Cart.prototype.toPriceString = function toPriceString(price) {
+      return '$' + price.toFixed(2);
+    };
+
+    Cart.prototype.buy = function buy() {
+      var _this3 = this;
+
+      this.audioBank.ding.cloneNode().play();
+      this.isBuying = true;
+      this.isProcessing = true;
+      this.resetCart();
+      setTimeout(function () {
+        _this3.isProcessing = false;
+        setTimeout(function () {
+          var $thankYouNote = _this3.$element.find('#thank-you-note');
+          $thankYouNote.removeClass('animated fadeOut');
+          $thankYouNote.addClass('animated fadeIn');
+        }, 0);
+      }, 900);
+      setTimeout(function () {
+        var $thankYouNote = _this3.$element.find('#thank-you-note');
+        $thankYouNote.removeClass('animated fadeIn');
+        $thankYouNote.addClass('animated fadeOut');
+        setTimeout(function () {
+          return _this3.isBuying = false;
+        }, 500);
+      }, 1500);
+    };
+
+    Cart.prototype.cartClicked = function cartClicked() {
+      if (this.shoppingCartToggle.getAttribute('aria-expanded') === 'true') {
+        this.audioBank.cartOpen.cloneNode().play();
+      } else {
+        this.audioBank.cartClose.cloneNode().play();
+      }
+    };
+
     _createClass(Cart, [{
+      key: 'isEmpty',
+      get: function get() {
+        return this.cartItemSet.size === 0;
+      }
+    }, {
       key: 'totalPriceString',
       get: function get() {
-        if (!this.cartItems.length) {
-          return '0.00';
+        if (this.isEmpty) {
+          return '$0.00';
         }
-        var total = this.cartItems.map(function (item) {
-          return item.price;
-        }).reduce(function (prev, curr) {
+        var total = Object.values(this.priceMap).reduce(function (prev, curr) {
           return prev + curr;
         }, 0.0);
-        return '' + this.cartItems[0].priceCurrencySymbol + total.toFixed(2);
+        return '$' + total.toFixed(2);
       }
     }]);
 
@@ -409,14 +490,14 @@ define('containers/shop-page/shop-page',['exports', '../../entities/shop-item'],
   var ShopPage = exports.ShopPage = function ShopPage() {
     _classCallCheck(this, ShopPage);
 
-    this.shopItems = [new _shopItem2.default('Saw blade', '../../media/img/saw-blade.jpg', 2.00, '$', 120), new _shopItem2.default('Hammer', '../../media/img/hammer.jpg', 15.00, '$', 25), new _shopItem2.default('Pliers', '../../media/img/pliers.jpg', 23.40, '$', 24), new _shopItem2.default('Drill', '../../media/img/drill.jpg', 100.00, '$', 5), new _shopItem2.default('Screwdriver kit', '../../media/img/screw-drivers.jpg', 35.00, '$', 10), new _shopItem2.default('Wrench', '../../media/img/wrench.jpg', 17.00, '$', 24)];
+    this.shopItems = [new _shopItem2.default('sb', 'Saw blade', '../../media/img/saw-blade.jpg', 2.00, '$', 12), new _shopItem2.default('hm', 'Hammer', '../../media/img/hammer.jpg', 15.00, '$', 25), new _shopItem2.default('pl', 'Pliers', '../../media/img/pliers.jpg', 23.40, '$', 24), new _shopItem2.default('dr', 'Drill', '../../media/img/drill.jpg', 100.00, '$', 5), new _shopItem2.default('sk', 'Screwdriver kit', '../../media/img/screw-drivers.jpg', 35.00, '$', 10), new _shopItem2.default('wr', 'Wrench', '../../media/img/wrench.jpg', 17.00, '$', 24)];
   };
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template><require from=\"jquery-ui-dist/jquery-ui.css\"></require><router-view></router-view></template>"; });
+define('text!components/cart/cart.html', ['module'], function(module) { module.exports = "<template><require from=\"./cart.css\"></require><div class=\"collapse navbar-collapse\"><div class=\"btn-group nav navbar-nav navbar-right\"><a href=\"#\" class=\"btn btn-default dropdown-toggle shopping-cart-toggle shopping-cart-container\" click.delegate=\"cartClicked()\" data-toggle=\"dropdown\" aria-expanded=\"false\"><span if.bind=\"!isBuying\" class=\"cart-phase-span\"><i class=\"shopping-cart-icon fa fa-shopping-cart\"></i><span class=\"total-text\"> Total: <span style=\"display:inline-block\" id=\"price-label\">${totalPriceString}</span></span> <span class=\"caret\"></span> </span><span if.bind=\"isBuying\"><span class=\"cart-phase-span\" if.bind=\"isProcessing\"><i class=\"cart-icon fa fa-circle-o-notch fa-spin\"></i> Processing...</span> <span class=\"cart-phase-span\" id=\"thank-you-note\" if.bind=\"!isProcessing\"><i class=\"cart-icon fa fa-check\"></i> Thank you!</span></span></a><ul class=\"dropdown-menu\"><li repeat.for=\"cartItem of cartItemSet\"><span class=\"dropdown-item\">${cartItem.name} &#10005; ${countMap[cartItem.code]} (${toPriceString(priceMap[cartItem.code])})</span></li><li if.bind=\"isEmpty\"><span class=\"dropdown-item\">Empty</span></li><li if.bind=\"!isEmpty\"><button click.trigger=\"buy()\" class=\"btn btn-buy btn-block btn-primary dropdown-item\">BUY</button></li></ul></div></div></template>"; });
+define('text!components/cart/cart.css', ['module'], function(module) { module.exports = ".shopping-cart-container {\n  float: right;\n  width: 225px; }\n  .shopping-cart-container + .dropdown-menu {\n    width: 100% !important; }\n\n.cart-phase-span {\n  display: inline-block; }\n\n.navbar-collapse.collapse {\n  display: block !important; }\n\n.navbar-nav > li, .navbar-nav {\n  float: left !important; }\n\n.navbar-nav.navbar-right:last-child {\n  margin-right: -15px !important; }\n\n.navbar-right {\n  float: right !important; }\n\n.dropdown-menu > li > .dropdown-item {\n  display: block;\n  padding: 3px 20px;\n  clear: both;\n  font-weight: normal;\n  line-height: 1.846;\n  color: #666666;\n  white-space: nowrap; }\n\n.btn-buy {\n  color: white !important; }\n\n#thank-you-note {\n  color: green; }\n"; });
 define('text!components/shop-item/shop-item.html', ['module'], function(module) { module.exports = "<template><require from=\"./shop-item.css\"></require><div class=\"item panel panel-primary\"><div class=\"panel-heading\"><h4 class=\"primary\">${shopItem.name}</h4><h5 class=\"secondary\">${shopItem.priceString}</h5></div><div class=\"panel-body\"><img class=\"item-image\" src=\"${shopItem.imgPath}\"><p>In stock: <strong class=\"${isOutOfStock ? 'stock-count-out' : 'stock-count-has'}\">${shopItem.stockCount}</strong></p></div><div class=\"panel-footer\"><button class=\"btn ${isOutOfStock ? 'disabled' : ''} btn-primary btn-block add-to-cart\" type=\"button\">${isOutOfStock ? 'Out of stock' : 'Add to cart'}</button></div></div></template>"; });
-define('text!components/cart/cart.html', ['module'], function(module) { module.exports = "<template><require from=\"./cart.css\"></require><div class=\"shopping-cart-container\"><i class=\"shopping-cart-icon\"></i> Total: ${totalPriceString}</div></template>"; });
 define('text!components/shop-item/shop-item.css', ['module'], function(module) { module.exports = ".item {\n  background-color: #fff;\n  float: left;\n  padding: 5px;\n  margin: 5px; }\n  .item img {\n    display: block;\n    margin: auto;\n    height: 200px;\n    width: 200px; }\n  .item p {\n    margin: 0; }\n  .item .stock-count-out {\n    color: red; }\n  .item .stock-count-has {\n    color: green; }\n\n.item.panel-primary .panel-heading h1.primary, .item.panel-primary .panel-heading h2.primary, .item.panel-primary .panel-heading h3.primary, .item.panel-primary .panel-heading h4.primary, .item.panel-primary .panel-heading h5.primary, .item.panel-primary .panel-heading h6.primary {\n  color: white !important; }\n\n.item.panel-primary .panel-heading h1.secondary, .item.panel-primary .panel-heading h2.secondary, .item.panel-primary .panel-heading h3.secondary, .item.panel-primary .panel-heading h4.secondary, .item.panel-primary .panel-heading h5.secondary, .item.panel-primary .panel-heading h6.secondary {\n  color: #F5F3F0 !important; }\n"; });
-define('text!components/cart/cart.css', ['module'], function(module) { module.exports = ".shopping-cart-container {\n  float: right; }\n\n.shopping-cart-icon {\n  display: inline-block;\n  background: url(\"http://cdn1.iconfinder.com/data/icons/jigsoar-icons/24/_cart.png\") no-repeat 0 0;\n  width: 24px;\n  height: 24px;\n  margin: 0 10px 0 0; }\n"; });
-define('text!containers/shop-page/shop-page.html', ['module'], function(module) { module.exports = "<template><require from=\"./shop-page.css\"></require><div class=\"navbar navbar-default navbar-fixed-top\"><div class=\"container\"><div class=\"navbar-header\"><span class=\"navbar-brand\">Rewarding Webstore</span></div><div class=\"collapse navbar-collapse\"><ul class=\"nav navbar-nav navbar-right\"><li><compose class=\"cart-port\" view-model.ref=\"cartViewModel\" view-model=\"../../components/cart/cart\"></compose></li></ul></div></div></div><div class=\"container\"><div class=\"bs-component\"><div class=\"wrapper\"><div class=\"items\"><compose repeat.for=\"shopItem of shopItems\" view-model=\"../../components/shop-item/shop-item\" model.bind=\"{ shopItem, cartViewModel }\"></compose></div></div></div></div></template>"; });
-define('text!containers/shop-page/shop-page.css', ['module'], function(module) { module.exports = ".wrapper {\n  width: 800px;\n  margin: 20px auto;\n  padding: 20px; }\n\n.items {\n  display: block;\n  margin: 20px 0; }\n\nbody {\n  padding-top: 30px; }\n\n.navbar-fixed-top {\n  z-index: auto !important; }\n  .navbar-fixed-top .shopping-cart-container {\n    margin-top: 20px !important; }\n"; });
+define('text!containers/shop-page/shop-page.html', ['module'], function(module) { module.exports = "<template><require from=\"./shop-page.css\"></require><div class=\"navbar navbar-default navbar-fixed-top\"><div class=\"container\"><div class=\"navbar-header\"><span class=\"navbar-brand\">Rewarding Tool Store</span></div><compose class=\"cart-port\" view-model.ref=\"cartViewModel\" view-model=\"../../components/cart/cart\"></compose></div></div><div class=\"container\"><div class=\"bs-component\"><div class=\"wrapper\"><div class=\"items\"><compose repeat.for=\"shopItem of shopItems\" view-model=\"../../components/shop-item/shop-item\" model.bind=\"{ shopItem, cartViewModel }\"></compose></div></div></div></div></template>"; });
+define('text!containers/shop-page/shop-page.css', ['module'], function(module) { module.exports = ".wrapper {\n  width: 800px;\n  margin: 20px auto;\n  padding: 20px; }\n\n.items {\n  display: block;\n  margin: 20px 0; }\n\nbody {\n  padding-top: 30px; }\n\n.navbar-fixed-top {\n  z-index: auto !important; }\n  .navbar-fixed-top .shopping-cart-container {\n    margin-top: 9px !important; }\n"; });
 //# sourceMappingURL=app-bundle.js.map

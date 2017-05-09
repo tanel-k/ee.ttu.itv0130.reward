@@ -1,6 +1,25 @@
 <template>
   <require from="./cart.css"></require>
-  <div class="shopping-cart-container">
-    <i class="shopping-cart-icon"></i> Total: ${totalPriceString}
+  <div class="collapse navbar-collapse">
+    <div class="btn-group nav navbar-nav navbar-right">
+      <a href="#" class="btn btn-default dropdown-toggle shopping-cart-toggle shopping-cart-container" 
+        click.delegate="cartClicked()" 
+        data-toggle="dropdown" 
+        aria-expanded="false">
+        <span if.bind="!isBuying" class="cart-phase-span">
+          <i class="shopping-cart-icon fa fa-shopping-cart"></i><span class="total-text"> Total: <span style="display: inline-block" id="price-label">${totalPriceString}</span></span>
+          <span class="caret"></span>
+        </span>
+        <span if.bind="isBuying">
+          <span class="cart-phase-span" if.bind="isProcessing"><i class="cart-icon fa fa-circle-o-notch fa-spin"></i> Processing...</span>
+          <span class="cart-phase-span" id="thank-you-note" if.bind="!isProcessing"><i class="cart-icon fa fa-check"></i> Thank you!</span>
+        </span>
+      </a>
+      <ul class="dropdown-menu">
+        <li repeat.for="cartItem of cartItemSet"><span class="dropdown-item">${cartItem.name} &#10005; ${countMap[cartItem.code]} (${toPriceString(priceMap[cartItem.code])})</span></li>
+        <li if.bind="isEmpty"><span class="dropdown-item">Empty</span></li>
+        <li if.bind="!isEmpty"><button click.trigger="buy()" class="btn btn-buy btn-block btn-primary dropdown-item">BUY</button></li>
+      </ul>
+    </div>
   </div>
 </template>

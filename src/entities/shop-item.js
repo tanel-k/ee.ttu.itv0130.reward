@@ -1,6 +1,7 @@
 export default class ShopItem {
-  constructor(name, imgPath, price, priceCurrencySymbol, stockCount) {
+  constructor(code, name, imgPath, price, priceCurrencySymbol, stockCount) {
     Object.assign(this, {
+      code,
       name,
       imgPath,
       price,
